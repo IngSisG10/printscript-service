@@ -21,10 +21,17 @@ repositories {
 	mavenCentral()
 }
 
+def env = new Properties()
+def envFile = file('.env')
+if (envFile.isFile() && envFile.canRead()) {
+    envFile.withInputStream { env.load(it) }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    apply plugin: 'maven-publish'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
@@ -53,5 +60,26 @@ tasks.register("installGitHooks", Exec) {
     commandLine "git", "config", "core.hooksPath", ".github/hooks"
     doLast {
         println("Hooks configured via core.hooksPath")
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = "printscript-${project.name}"
+            version = project.version
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/IngSisG10/printscript-tp1")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: env.getProperty("GITHUB_ACTOR") ?: ""
+                password = System.getenv("GITHUB_TOKEN") ?: env.getProperty("GITHUB_TOKEN") ?: ""
+            }
+        }
     }
 }
