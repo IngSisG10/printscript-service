@@ -12,13 +12,9 @@ version = '0.0.2-SNAPSHOT'
 description = 'printscript service for multi-service project'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
-
-repositories {
-	mavenCentral()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 def env = new Properties()
@@ -27,11 +23,32 @@ if (envFile.isFile() && envFile.canRead()) {
     envFile.withInputStream { env.load(it) }
 }
 
+repositories {
+    // mavenLocal()
+    mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/IngSisG10/printscript-tp1")
+        credentials {
+            username = env?.getProperty("GITHUB_ACTOR") ?: System.getenv("GITHUB_ACTOR")
+            password = env?.getProperty("GITHUB_TOKEN") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'com.ingsis.grupo10:printscript-interpreter:1.2.0'
+    implementation 'com.ingsis.grupo10:printscript-parser:1.2.0'
+    implementation 'com.ingsis.grupo10:printscript-lexer:1.2.0'
+    implementation 'com.ingsis.grupo10:printscript-common:1.2.0'
+    implementation 'com.ingsis.grupo10:printscript-formatter:1.2.0'
+    implementation 'com.ingsis.grupo10:printscript-linter:1.2.0'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
