@@ -1,0 +1,6 @@
+services:
+  app:
+    build: .
+    container_name: printscript-service
+    ports:
+      - "8080:8080"
