@@ -46,3 +46,12 @@ allOpen {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register("installGitHooks", Exec) {
+    group = "setup"
+    description = "Install git hooks"
+    commandLine "git", "config", "core.hooksPath", ".github/hooks"
+    doLast {
+        println("Hooks configured via core.hooksPath")
+    }
+}
