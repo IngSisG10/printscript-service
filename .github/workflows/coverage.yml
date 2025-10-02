@@ -7,7 +7,7 @@ on:
 
 jobs:
   coverage:
-    name: Kover Coverage
+    name: coverage kover
     runs-on: ubuntu-latest
     permissions:
       contents: read
