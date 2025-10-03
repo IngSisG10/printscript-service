@@ -38,9 +38,7 @@ class PrintscriptController(
     ): ResponseEntity<InputStreamResource> = printscriptService.execute(snippet.inputStream, version ?: "1.0")
 
     @PostMapping(
-        "/verify",
-        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
-        produces = [MediaType.TEXT_PLAIN_VALUE],
+        "/verify"
     )
     fun verify(
         @RequestParam(value = "version", required = false) version: String?,
@@ -52,10 +50,8 @@ class PrintscriptController(
         return printscriptService.verify(snippet.inputStream, configContent, version ?: "1.0")
     }
 
-    @GetMapping(
-        "/format",
-        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
-        produces = [MediaType.TEXT_PLAIN_VALUE],
+    @PostMapping(
+        "/format"
     )
     fun format(
         @RequestParam(value = "version", required = false) version: String?,

@@ -106,24 +106,16 @@ class PrintscriptService {
         configText: String,
         version: String,
     ): ResponseEntity<out Any?> {
+        val outputBuilder = StringBuilder()
         val lexer = createLexer(version)
         val formatter = FormatterUtil.createFormatter(configText, version)
         fileText.segmentsBySemicolonPreserveWhitespace().forEach { segment ->
-            return try {
-                val outputBuilder = StringBuilder()
+            try {
                 val tokens = lexer.lex(segment)
                 val output = formatter.format(tokens)
                 output.forEach { line ->
-                    outputBuilder.appendLine(line)
+                    outputBuilder.append(line)
                 }
-
-                val inputStream = ByteArrayInputStream(outputBuilder.toString().toByteArray())
-
-                ResponseEntity
-                    .ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=result.txt")
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .body(InputStreamResource(inputStream))
             } catch (t: Throwable) {
                 val errorStream = ByteArrayInputStream("Error: ${t.message}".toByteArray())
                 ResponseEntity
@@ -132,6 +124,6 @@ class PrintscriptService {
                     .body(InputStreamResource(errorStream))
             }
         }
-        return ResponseEntity.badRequest().body("No segments were sent")
+        return ResponseEntity.ok().body(outputBuilder.toString())
     }
 }
