@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -37,9 +36,7 @@ class PrintscriptController(
         @RequestParam(value = "version", required = false) version: String?,
     ): ResponseEntity<InputStreamResource> = printscriptService.execute(snippet.inputStream, version ?: "1.0")
 
-    @PostMapping(
-        "/verify"
-    )
+    @PostMapping("/verify")
     fun verify(
         @RequestParam(value = "version", required = false) version: String?,
         @RequestPart("snippet") snippet: MultipartFile,
@@ -50,9 +47,7 @@ class PrintscriptController(
         return printscriptService.verify(snippet.inputStream, configContent, version ?: "1.0")
     }
 
-    @PostMapping(
-        "/format"
-    )
+    @PostMapping("/format")
     fun format(
         @RequestParam(value = "version", required = false) version: String?,
         @RequestPart("snippet") snippet: MultipartFile,
