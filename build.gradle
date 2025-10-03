@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.ingsis.grupo10'
-version = '0.0.2-SNAPSHOT'
+version = '1.0.0'
 description = 'printscript service for multi-service project'
 
 java {
