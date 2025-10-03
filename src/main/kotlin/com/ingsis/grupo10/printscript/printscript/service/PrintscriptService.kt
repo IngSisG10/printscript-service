@@ -42,7 +42,6 @@ class PrintscriptService {
                 }
             }
 
-            // Convertir el resultado a InputStream
             val inputStream = ByteArrayInputStream(outputBuilder.toString().toByteArray())
 
             ResponseEntity
@@ -89,7 +88,6 @@ class PrintscriptService {
                         )
                 }
             } catch (t: Throwable) {
-                // ⚠️ Esto es error de ejecución, NO lint → respondemos 400 inmediatamente
                 return ResponseEntity
                     .badRequest()
                     .body(RuntimeErrorDTO(error = t.message ?: t.toString()))
@@ -97,11 +95,9 @@ class PrintscriptService {
         }
 
         if (!sawAnySegment) {
-            // request válido pero sin contenido útil
             return ResponseEntity.ok(LintResultDTO(errors = emptyList()))
         }
 
-        // 200 siempre para resultados de lint (con o sin findings)
         return ResponseEntity.ok(LintResultDTO(errors = allErrors))
     }
 
