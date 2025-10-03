@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/health")
 class Health {
-
     @GetMapping
-    fun health(): ResponseEntity<HttpStatus> {
-        return ResponseEntity.ok().build()
-    }
+    fun health(): ResponseEntity<HttpStatus> = ResponseEntity.ok().build()
 }
