@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [ "main" ]   # se ejecuta en PRs hacia master
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: build
@@ -23,3 +26,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
