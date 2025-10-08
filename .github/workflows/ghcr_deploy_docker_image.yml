@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  packages: read
 
 jobs:
   build:
@@ -44,3 +44,6 @@ jobs:
           tags: |
             ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.tag }}
             ${{ steps.tags.outputs.image }}:${{ github.sha }}
+          secrets: | 
+            gpr_user=${{ github.actor }}
+            gpr_key=${{ secrets.GITHUB_TOKEN }}
