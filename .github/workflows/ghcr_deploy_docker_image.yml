@@ -37,6 +37,9 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          build-args: |
+            GITHUB_ACTOR=${{ github.actor }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           push: true
           tags: |
             ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.tag }}
