@@ -1,6 +1,21 @@
 FROM gradle:8.7-jdk21 AS builder
 WORKDIR /home/gradle/src
+
+# 1) Declarar args que vienen del workflow
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
+
+# 2) Copiar código con permisos del user gradle
 COPY --chown=gradle:gradle . .
+
+# 3) Escribir credenciales para repos privados (GitHub Packages, etc.)
+RUN mkdir -p /home/gradle/.gradle \
+ && printf "gpr.user=%s\ngpr.key=%s\n" "$GITHUB_ACTOR" "$GITHUB_TOKEN" > /home/gradle/.gradle/gradle.properties
+
+# (opcional pero útil para evitar problemas): desactiva watcher y daemon
+ENV GRADLE_OPTS="-Dorg.gradle.vfs.watch=false -Dorg.gradle.daemon=false"
+
+# 4) Build
 RUN gradle clean bootJar -x test --no-daemon --stacktrace
 
 FROM eclipse-temurin:21-jre-alpine
