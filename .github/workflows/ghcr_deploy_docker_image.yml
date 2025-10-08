@@ -28,10 +28,10 @@ jobs:
         id: tags
         run: |
           REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE="ghcr.io/${REPO_LC}"
+          IMAGE="ghcr.io/${REPO_LC}
           TAG="${{ github.event.inputs.tag || 'latest' }}"
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG"     >> "$GITHUB_OUTPUT"
 
       - name: Build & Push
         uses: docker/build-push-action@v6
@@ -39,5 +39,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ steps.t.outputs.image }}:${{ steps.t.outputs.tag }}
-            ${{ steps.t.outputs.image }}:${{ github.sha }}
+            ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.tag }}
+            ${{ steps.tags.outputs.image }}:${{ github.sha }}
