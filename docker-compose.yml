@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.local
     container_name: printscript-service
     ports:
       - "8080:8080"
