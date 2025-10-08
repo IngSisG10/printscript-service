@@ -94,8 +94,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/IngSisG10/printscript-service")
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: env.getProperty("GITHUB_ACTOR") ?: ""
-                password = System.getenv("GITHUB_TOKEN") ?: env.getProperty("GITHUB_TOKEN") ?: ""
+                username = System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user") ?: env.getProperty("GITHUB_ACTOR") ?: ""
+                password = System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.key") ?: env.getProperty("GITHUB_TOKEN") ?: ""
             }
         }
     }
