@@ -1,0 +1,83 @@
+name: deploy-only
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag a desplegar (latest, vX.Y, o SHA)"
+        required: false
+        default: latest
+      wait_ssh:
+        description: "Esperar SSH antes de desplegar"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: read   # necesario si usás GHCR
+
+env:
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+  SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
+
+  # ===== Registro e imagen (por defecto GHCR) =====
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/app
+  REGISTRY: ghcr.io
+  REG_USER: ${{ github.actor }}
+  REG_TOKEN: ${{ secrets.GHCR_RO_TOKEN || secrets.GITHUB_TOKEN }}
+
+jobs:
+  maybe_wait_ssh:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.wait_ssh }}
+    steps:
+      - name: Esperar SSH
+        run: |
+          echo "Esperando SSH en ${{ env.SSH_HOST }}:${{ env.SSH_PORT }} ..."
+          for i in {1..60}; do
+            if nc -z ${{ env.SSH_HOST }} ${{ env.SSH_PORT }}; then
+              echo "SSH arriba."; exit 0
+            fi
+            sleep 5
+          done
+          echo "Timeout esperando SSH." && exit 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [maybe_wait_ssh]
+    steps:
+      # (opcional) login en el runner si querés usar docker tooling local
+      - name: Login en registro (opcional)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.REG_USER }}
+          password: ${{ env.REG_TOKEN }}
+
+      - name: Desplegar por SSH (docker compose)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          port: ${{ env.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -euo pipefail
+            TAG="${{ github.event.inputs.tag || 'latest' }}"
+            IMAGE="${{ env.IMAGE_NAME }}:${TAG}"
+
+            echo "${{ env.REG_TOKEN }}" | docker login ${{ env.REGISTRY }} -u "${{ env.REG_USER }}" --password-stdin
+
+            cd /opt/app
+            # Forzar la imagen/tag deseados en el compose:
+            sed -i "s#^\(\s*image:\s*\).*#\1${IMAGE}#g" docker-compose.yml
+
+            echo "Pull de la nueva imagen…"
+            docker pull "${IMAGE}" || true
+            docker compose pull || true
+
+            echo "Levantar/actualizar servicio…"
+            docker compose up -d --remove-orphans
+
+            echo "Limpieza de imágenes viejas…"
+            docker image prune -af || true
