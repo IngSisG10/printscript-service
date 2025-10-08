@@ -1,4 +1,4 @@
-name: build-and-publish-docker-image
+name: ghcr-publish-docker-image
 on:
   workflow_dispatch:
     inputs:

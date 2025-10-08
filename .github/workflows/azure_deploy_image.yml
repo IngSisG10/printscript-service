@@ -1,4 +1,4 @@
-name: deploy-only
+name: azure-deploy-only
 on:
   workflow_dispatch:
     inputs:
