@@ -25,10 +25,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set tags
-        id: t
+        id: tags
         run: |
-          echo "image=ghcr.io/${{ github.repository }}" >> $GITHUB_OUTPUT
-          echo "tag=${{ github.event.inputs.tag || 'latest' }}" >> $GITHUB_OUTPUT
+          REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${REPO_LC}"
+          TAG="${{ github.event.inputs.tag || 'latest' }}"
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Build & Push
         uses: docker/build-push-action@v6
