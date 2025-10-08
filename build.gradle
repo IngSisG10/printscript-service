@@ -90,12 +90,12 @@ publishing {
         }
     }
     repositories {
+        mavenCentral()
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/IngSisG10/printscript-service")
+            url = uri("https://maven.pkg.github.com/IngSisG10/printscript-tp1")
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user") ?: env.getProperty("GITHUB_ACTOR") ?: ""
-                password = System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.key") ?: env.getProperty("GITHUB_TOKEN") ?: ""
+                username = (findProperty("gpr.user") as String?) ?: System.getenv("GITHUB_ACTOR")
+                password = (findProperty("gpr.key") as String?) ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }

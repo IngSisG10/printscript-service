@@ -1,12 +1,14 @@
-FROM gradle:8.7-jdk21 AS builder
+FROM gradle:8.14.0-jdk21 AS builder
 WORKDIR /home/gradle/src
-ARG GITHUB_ACTOR
-ARG GITHUB_TOKEN
 COPY --chown=gradle:gradle . .
-RUN mkdir -p /home/gradle/.gradle \
- && printf "gpr.user=%s\ngpr.key=%s\n" "$GITHUB_ACTOR" "$GITHUB_TOKEN" > /home/gradle/.gradle/gradle.properties
 ENV GRADLE_OPTS="-Dorg.gradle.vfs.watch=false -Dorg.gradle.daemon=false"
-RUN gradle clean bootJar -x test --no-daemon --stacktrace
+
+RUN --mount=type=secret,id=gpr_user \
+    --mount=type=secret,id=gpr_key \
+    test -s /run/secrets/gpr_user && test -s /run/secrets/gpr_key && \
+    gradle clean bootJar -x test --no-daemon --stacktrace \
+      -Pgpr.user="$(cat /run/secrets/gpr_user)" \
+      -Pgpr.key="$(cat /run/secrets/gpr_key)"
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
