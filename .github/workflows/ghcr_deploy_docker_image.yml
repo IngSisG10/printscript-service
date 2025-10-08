@@ -28,7 +28,7 @@ jobs:
         id: tags
         run: |
           REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE="ghcr.io/${REPO_LC}
+          IMAGE="ghcr.io/${REPO_LC}"
           TAG="${{ github.event.inputs.tag || 'latest' }}"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG"     >> "$GITHUB_OUTPUT"
