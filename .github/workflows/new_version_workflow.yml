@@ -34,11 +34,12 @@ jobs:
           set -euo pipefail
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
-
+          
           mapfile -t TAGS_AFTER < <(git tag --merged "$AFTER" --list 'v*' | sort -V)
           mapfile -t TAGS_BEFORE < <(git tag --merged "$BEFORE" --list 'v*' | sort -V)
-
-          NEW=$(comm -13 <(printf "%s\n" "${TAGS_BEFORE[@]+"${TAGS_BEFORE[@]}"})" <(printf "%s\n" "${TAGS_AFTER[@]}") | sort -V | tail -n1 || true)
+          
+          NEW=$(comm -13 <(printf "%s\n" "${TAGS_BEFORE[@]+"${TAGS_BEFORE[@]}"}" | sort -V) <(printf "%s\n" "${TAGS_AFTER[@]}" | sort -V) | tail -n1 || true)
+          
           if [[ -n "$NEW" ]]; then
             echo "New tag reachable in main: $NEW"
             echo "tag=$NEW" >> "$GITHUB_OUTPUT"
@@ -69,6 +70,7 @@ jobs:
 
   deploy-image-in-vm:
     needs:
+      - publish-image
       - start-vm
       - detect-tag
     if: ${{ needs.detect-tag.outputs.tag != '' }}
