@@ -6,6 +6,11 @@ on:
         description: "Usar deallocate (recomendado para dejar de pagar compute)"
         type: boolean
         default: true
+  workflow_call:
+    inputs:
+      deallocate:
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -30,3 +35,4 @@ jobs:
               --name "${{ secrets.AZURE_VM_NAME }}" \
               --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}"
           fi
+
