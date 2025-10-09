@@ -6,6 +6,12 @@ on:
         description: "Tag de la imagen (ej. v1.2.3)"
         required: false
         default: latest
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: false
+        default: latest
 
 permissions:
   contents: read
