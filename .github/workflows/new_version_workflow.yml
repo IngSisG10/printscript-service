@@ -21,13 +21,13 @@ jobs:
     outputs:
       tag: ${{ steps.find.outputs.tag }}
     steps:
-      - name: Checkout con historial y tags
+      - name: Checkout with history and tags
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Encontrar tag de versión que llegó con este merge
+      - name: Find version tag that arrived with this merge
         id: find
         shell: bash
         run: |
@@ -38,13 +38,12 @@ jobs:
           mapfile -t TAGS_AFTER < <(git tag --merged "$AFTER" --list 'v*' | sort -V)
           mapfile -t TAGS_BEFORE < <(git tag --merged "$BEFORE" --list 'v*' | sort -V)
 
-          NEW=$(comm -13 <(printf "%s\n" "${TAGS_BEFORE[@]}") <(printf "%s\n" "${TAGS_AFTER[@]}") | sort -V | tail -n1 || true)
-
+          NEW=$(comm -13 <(printf "%s\n" "${TAGS_BEFORE[@]+"${TAGS_BEFORE[@]}"})" <(printf "%s\n" "${TAGS_AFTER[@]}") | sort -V | tail -n1 || true)
           if [[ -n "$NEW" ]]; then
-            echo "Nuevo tag alcanzable en main: $NEW"
+            echo "New tag reachable in main: $NEW"
             echo "tag=$NEW" >> "$GITHUB_OUTPUT"
           else
-            echo "No hay tags nuevos alcanzables en main en este push."
+            echo "No new tags reachable in main in this push."
             echo "tag=" >> "$GITHUB_OUTPUT"
           fi
 
