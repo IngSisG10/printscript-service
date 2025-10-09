@@ -103,9 +103,8 @@ publishing {
         }
     }
     repositories {
-        mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/IngSisG10/printscript-tp1")
+            url = uri("https://maven.pkg.github.com/IngSisG10/printscript-service")
             credentials {
                 username = env?.getProperty("GITHUB_ACTOR") ?: System.getenv("GITHUB_ACTOR")
                 password = env?.getProperty("GITHUB_TOKEN") ?: System.getenv("GITHUB_TOKEN")
