@@ -1,0 +1,87 @@
+name: new_version_workflow.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      shut_down_vm_after:
+        description: "Shut down the vm after all the action"
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  detect-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.find.outputs.tag }}
+    steps:
+      - name: Checkout con historial y tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Encontrar tag de versión que llegó con este merge
+        id: find
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          mapfile -t TAGS_AFTER < <(git tag --merged "$AFTER" --list 'v*' | sort -V)
+          mapfile -t TAGS_BEFORE < <(git tag --merged "$BEFORE" --list 'v*' | sort -V)
+
+          NEW=$(comm -13 <(printf "%s\n" "${TAGS_BEFORE[@]}") <(printf "%s\n" "${TAGS_AFTER[@]}") | sort -V | tail -n1 || true)
+
+          if [[ -n "$NEW" ]]; then
+            echo "Nuevo tag alcanzable en main: $NEW"
+            echo "tag=$NEW" >> "$GITHUB_OUTPUT"
+          else
+            echo "No hay tags nuevos alcanzables en main en este push."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish-package:
+    needs: detect-tag
+    if: ${{ needs.detect-tag.outputs.tag != '' }}
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit
+
+  publish-image:
+    needs: detect-tag
+    if: ${{ needs.detect-tag.outputs.tag != '' }}
+    uses: ./.github/workflows/ghcr_deploy_docker_image.yml
+    with:
+      tag: ${{ needs.detect-tag.outputs.tag }}
+    secrets: inherit
+
+  start-vm:
+    needs: detect-tag
+    if: ${{ needs.detect-tag.outputs.tag != '' }}
+    uses: ./.github/workflows/azure_start_vm.yml
+    secrets: inherit
+
+  deploy-image-in-vm:
+    needs:
+      - start-vm
+      - detect-tag
+    if: ${{ needs.detect-tag.outputs.tag != '' }}
+    uses: ./.github/workflows/azure_deploy_image.yml
+    with:
+      tag: ${{ needs.detect-tag.outputs.tag }}
+    secrets: inherit
+
+  shut-down-vm:
+    needs:
+      - deploy-image-in-vm
+      - detect-tag
+    if: ${{ needs.detect-tag.outputs.tag != '' && (github.event_name == 'workflow_dispatch' && inputs.shut_down_vm_after) }}
+    uses: ./.github/workflows/azure_stop_vm.yml
+    secrets: inherit
