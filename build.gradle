@@ -6,10 +6,23 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.kotlinx.kover' version '0.9.2'
     id 'org.jlleitschuh.gradle.ktlint' version '13.0.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.18.16'
+}
+
+scmVersion {
+    tag {
+        prefix = 'v'  // tags tipo v1.2.3
+    }
+    // Permitir release solo en main
+    release {
+        releaseOnlyOnReleaseBranches = true
+        releaseBranchNames = ['main']
+    }
+    versionCreator 'simple'
 }
 
 group = 'com.ingsis.grupo10'
-version = '1.0.0'
+version = scmVersion.version
 description = 'printscript service for multi-service project'
 
 java {
