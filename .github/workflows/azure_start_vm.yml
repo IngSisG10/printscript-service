@@ -13,6 +13,8 @@ permissions:
 jobs:
   start:
     runs-on: ubuntu-latest
+    outputs:
+      pre_status: ${{ steps.get_pre.outputs.status }}
     steps:
       - name: Azure Login
         uses: azure/login@v2
