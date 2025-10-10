@@ -1,15 +1,18 @@
-name: new_version_workflow.yml
+name: new_version_workflow
 
 on:
   workflow_dispatch:
     inputs:
+      tag:
+        description: "Tag a usar (ej. v1.2.3). Si lo dejás vacío y no es manual, se toma el del push."
+        required: false
       shut_down_vm_after:
-        description: "Shut down the vm after all the action"
+        description: "Shut down the VM after all the action"
         type: boolean
         default: false
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -27,26 +30,26 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Find version tag that arrived with this merge
+      - name: Resolve tag
         id: find
         shell: bash
         run: |
           set -euo pipefail
-          BEFORE="${{ github.event.before }}"
-          AFTER="${{ github.sha }}"
-          
-          mapfile -t TAGS_AFTER < <(git tag --merged "$AFTER" --list 'v*' | sort -V)
-          mapfile -t TAGS_BEFORE < <(git tag --merged "$BEFORE" --list 'v*' | sort -V)
-          
-          NEW=$(comm -13 <(printf "%s\n" "${TAGS_BEFORE[@]+"${TAGS_BEFORE[@]}"}" | sort -V) <(printf "%s\n" "${TAGS_AFTER[@]}" | sort -V) | tail -n1 || true)
-          
-          if [[ -n "$NEW" ]]; then
-            echo "New tag reachable in main: $NEW"
-            echo "tag=$NEW" >> "$GITHUB_OUTPUT"
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
           else
-            echo "No new tags reachable in main in this push."
-            echo "tag=" >> "$GITHUB_OUTPUT"
+            # workflow_dispatch (manual): permitir pasar el tag por input
+            TAG="${{ inputs.tag || '' }}"
           fi
+
+          if [[ -z "${TAG}" ]]; then
+            echo "No tag provided/detected. Exiting gracefully."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Using tag: ${TAG}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
   publish-package:
     needs: detect-tag
