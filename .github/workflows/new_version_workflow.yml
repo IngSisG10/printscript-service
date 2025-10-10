@@ -6,10 +6,7 @@ on:
       tag:
         description: "Tag a usar (ej. v1.2.3). Si lo dejás vacío y no es manual, se toma el del push."
         required: false
-      shut_down_vm_after:
-        description: "Shut down the VM after all the action"
-        type: boolean
-        default: false
+
   push:
     tags:
       - "v*"
@@ -86,7 +83,6 @@ jobs:
     needs:
       - start-vm
       - deploy-image-in-vm
-      - detect-tag
-    if: ${{ (needs.detect-tag.outputs.tag != '' && (github.event_name == 'workflow_dispatch' && inputs.shut_down_vm_after)) || (github.event_name == 'push' && needs.start-vm.outputs.pre_status == 'VM deallocated') }}
+    if: ${{ needs.start-vm.outputs.pre_status == 'VM deallocated' }}
     uses: ./.github/workflows/azure_stop_vm.yml
     secrets: inherit
