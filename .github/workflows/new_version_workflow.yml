@@ -84,8 +84,9 @@ jobs:
 
   shut-down-vm:
     needs:
+      - start-vm
       - deploy-image-in-vm
       - detect-tag
-    if: ${{ needs.detect-tag.outputs.tag != '' && (github.event_name == 'workflow_dispatch' && inputs.shut_down_vm_after) }}
+    if: ${{ (needs.detect-tag.outputs.tag != '' && (github.event_name == 'workflow_dispatch' && inputs.shut_down_vm_after)) || (github.event_name == 'push' && needs.start-vm.outputs.pre_status == 'VM deallocated') }}
     uses: ./.github/workflows/azure_stop_vm.yml
     secrets: inherit
