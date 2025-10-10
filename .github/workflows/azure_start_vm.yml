@@ -29,7 +29,7 @@ jobs:
             --query "instanceView.statuses[?starts_with(code, 'PowerState/')].displayStatus" \
             -o tsv)
           echo "VM status before start: $STATUS"
-          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"          
 
       - name: Start VM
         run: |
