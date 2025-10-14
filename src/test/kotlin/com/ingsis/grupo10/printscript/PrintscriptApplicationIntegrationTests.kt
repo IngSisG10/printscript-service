@@ -14,7 +14,6 @@ import kotlin.test.assertNotNull
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class PrintscriptApplicationIntegrationTests {
-
     @LocalServerPort
     private var port: Int = 0
 
@@ -36,10 +35,11 @@ class PrintscriptApplicationIntegrationTests {
 
     @Test
     fun `health endpoint returns OK`() {
-        val response = restTemplate.getForEntity(
-            "http://localhost:$port/health",
-            String::class.java
-        )
+        val response =
+            restTemplate.getForEntity(
+                "http://localhost:$port/health",
+                String::class.java,
+            )
         assertEquals(HttpStatus.OK, response.statusCode)
     }
 

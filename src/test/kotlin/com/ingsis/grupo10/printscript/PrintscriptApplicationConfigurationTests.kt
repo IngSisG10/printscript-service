@@ -6,7 +6,6 @@ import kotlin.test.assertNotNull
 
 @SpringBootTest
 class PrintscriptApplicationConfigurationTests {
-
     @Test
     fun `application loads with test configuration`() {
         assertNotNull(this)

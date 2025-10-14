@@ -1,8 +1,10 @@
 package com.ingsis.grupo10.printscript
 
 import com.ingsis.grupo10.printscript.printscript.service.PrintscriptService
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertThrows
 import org.mockito.ArgumentMatchers
 import org.springframework.boot.test.context.SpringBootTest
@@ -13,7 +15,6 @@ import java.io.ByteArrayInputStream
 
 @SpringBootTest
 class PrintscriptServiceTest {
-
     private val printscriptService = PrintscriptService()
 
     // Helper function to avoid null issues with Mockito in Kotlin
@@ -69,12 +70,13 @@ class PrintscriptServiceTest {
     fun format_with_spacing_rules_returns_formatted_code() {
         val code = "let x=5;println(x);"
         val codeStream = ByteArrayInputStream(code.toByteArray())
-        val config = """
+        val config =
+            """
             {
                 "enforce-spacing-around-equals": true,
                 "indent": 2
             }
-        """.trimIndent()
+            """.trimIndent()
         val version = "1.0"
 
         val response = printscriptService.format(codeStream, config, version)
@@ -88,12 +90,13 @@ class PrintscriptServiceTest {
     fun format_without_spacing_rules_returns_formatted_code() {
         val code = "let x = 5; println(x);"
         val codeStream = ByteArrayInputStream(code.toByteArray())
-        val config = """
+        val config =
+            """
             {
                 "enforce-spacing-around-equals": false,
                 "indent": 4
             }
-        """.trimIndent()
+            """.trimIndent()
         val version = "1.0"
 
         val response = printscriptService.format(codeStream, config, version)
@@ -118,11 +121,12 @@ class PrintscriptServiceTest {
     fun verify_camel_case_valid_code_returns_success() {
         val code = "let variableName: number = 5;"
         val codeStream = ByteArrayInputStream(code.toByteArray())
-        val config = """
+        val config =
+            """
             {
                 "identifier_format": "camel case"
             }
-        """.trimIndent()
+            """.trimIndent()
         val version = "1.0"
 
         val response = printscriptService.verify(codeStream, config, version)
@@ -135,28 +139,34 @@ class PrintscriptServiceTest {
     fun verify_camel_case_invalid_code_returns_error() {
         val code = "let snake_case_variable: number = 5;"
         val codeStream = ByteArrayInputStream(code.toByteArray())
-        val config = """
+        val config =
+            """
             {
                 "identifier_format": "camel case"
             }
-        """.trimIndent()
+            """.trimIndent()
         val version = "1.0"
 
         val response = printscriptService.verify(codeStream, config, version)
 
         assertNotNull(response.body)
-        assertTrue(response.body.toString().contains("LintResultDTO(errors=[LintErrorDTO(message=Invalid camelCase identifier at row 0 and position 4, type=InvalidCamelCaseException, segment=1)])"))
+        assertTrue(
+            response.body.toString().contains(
+                "LintResultDTO(errors=[LintErrorDTO(message=Invalid camelCase identifier at row 0 and position 4, type=InvalidCamelCaseException, segment=1)])",
+            ),
+        )
     }
 
     @Test
     fun verify_snake_case_valid_code_returns_success() {
         val code = "let snake_case_variable: number = 5;"
         val codeStream = ByteArrayInputStream(code.toByteArray())
-        val config = """
+        val config =
+            """
             {
                 "identifier_format": "snake case"
             }
-        """.trimIndent()
+            """.trimIndent()
         val version = "1.0"
 
         val response = printscriptService.verify(codeStream, config, version)

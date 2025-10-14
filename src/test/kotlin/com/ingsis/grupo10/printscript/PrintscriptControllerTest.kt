@@ -26,7 +26,6 @@ import java.io.InputStream
 @WebMvcTest(PrintscriptController::class)
 @Import(PrintscriptControllerTest.MockBeans::class)
 class PrintscriptControllerTest {
-
     @TestConfiguration
     class MockBeans {
         @Bean
@@ -44,25 +43,27 @@ class PrintscriptControllerTest {
 
     @Test
     fun execute_returns_stream() {
-        val snippet = MockMultipartFile(
-            "snippet",
-            "code.txt",
-            "text/plain",
-            "println(\"Hi\")".toByteArray()
-        )
+        val snippet =
+            MockMultipartFile(
+                "snippet",
+                "code.txt",
+                "text/plain",
+                "println(\"Hi\")".toByteArray(),
+            )
 
         `when`(printscriptService.execute(any<InputStream>(), any<String>())).thenReturn(
-            ResponseEntity.ok()
+            ResponseEntity
+                .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body(InputStreamResource(ByteArrayInputStream("OUTPUT".toByteArray())))
+                .body(InputStreamResource(ByteArrayInputStream("OUTPUT".toByteArray()))),
         )
 
-        mockMvc.perform(
-            multipart("/api/printscript/execute")
-                .file(snippet)
-                .param("version", "2.0")
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                multipart("/api/printscript/execute")
+                    .file(snippet)
+                    .param("version", "2.0"),
+            ).andExpect(status().isOk)
             .andExpect(content().string("OUTPUT"))
 
         verify(printscriptService).execute(any<InputStream>(), any<String>())
@@ -70,32 +71,35 @@ class PrintscriptControllerTest {
 
     @Test
     fun format_returns_formatted_code() {
-        val snippet = MockMultipartFile(
-            "snippet",
-            "code.txt",
-            "text/plain",
-            "let x=5;".toByteArray()
-        )
-        val config = MockMultipartFile(
-            "config",
-            "format-config.json",
-            "application/json",
-            "{ \"enforce-spacing-around-equals\": true}".toByteArray()
-        )
+        val snippet =
+            MockMultipartFile(
+                "snippet",
+                "code.txt",
+                "text/plain",
+                "let x=5;".toByteArray(),
+            )
+        val config =
+            MockMultipartFile(
+                "config",
+                "format-config.json",
+                "application/json",
+                "{ \"enforce-spacing-around-equals\": true}".toByteArray(),
+            )
 
         `when`(printscriptService.format(any<InputStream>(), any<String>(), any<String>())).thenReturn(
-            ResponseEntity.ok()
+            ResponseEntity
+                .ok()
                 .contentType(MediaType.TEXT_PLAIN)
-                .body("let x = 5;")
+                .body("let x = 5;"),
         )
 
-        mockMvc.perform(
-            multipart("/api/printscript/format")
-                .file(snippet)
-                .file(config)
-                .param("version", "1.0")
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                multipart("/api/printscript/format")
+                    .file(snippet)
+                    .file(config)
+                    .param("version", "1.0"),
+            ).andExpect(status().isOk)
             .andExpect(content().string("let x = 5;"))
 
         verify(printscriptService).format(any<InputStream>(), any<String>(), any<String>())
@@ -103,31 +107,34 @@ class PrintscriptControllerTest {
 
     @Test
     fun verify_returns_validation_result() {
-        val snippet = MockMultipartFile(
-            "snippet",
-            "code.txt",
-            "text/plain",
-            "let x: number = 5;".toByteArray()
-        )
-        val config = MockMultipartFile(
-            "config",
-            "verify-config.json",
-            "application/json",
-            "{\"identifier_format\": \"camel case\",}".toByteArray()
-        )
+        val snippet =
+            MockMultipartFile(
+                "snippet",
+                "code.txt",
+                "text/plain",
+                "let x: number = 5;".toByteArray(),
+            )
+        val config =
+            MockMultipartFile(
+                "config",
+                "verify-config.json",
+                "application/json",
+                "{\"identifier_format\": \"camel case\",}".toByteArray(),
+            )
 
         `when`(printscriptService.verify(any<InputStream>(), any<String>(), any<String>())).thenReturn(
-            ResponseEntity.ok()
-                .body("Code is valid")
+            ResponseEntity
+                .ok()
+                .body("Code is valid"),
         )
 
-        mockMvc.perform(
-            multipart("/api/printscript/verify")
-                .file(snippet)
-                .file(config)
-                .param("version", "1.0")
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                multipart("/api/printscript/verify")
+                    .file(snippet)
+                    .file(config)
+                    .param("version", "1.0"),
+            ).andExpect(status().isOk)
             .andExpect(content().string("Code is valid"))
 
         verify(printscriptService).verify(any<InputStream>(), any<String>(), any<String>())
@@ -135,26 +142,28 @@ class PrintscriptControllerTest {
 
     @Test
     fun verify_returns_bad_request_for_invalid_config() {
-        val snippet = MockMultipartFile(
-            "snippet",
-            "code.txt",
-            "text/plain",
-            "let x = 5;".toByteArray()
-        )
-        val config = MockMultipartFile(
-            "config",
-            "config.txt",
-            "text/plain",
-            "not json".toByteArray()
-        )
+        val snippet =
+            MockMultipartFile(
+                "snippet",
+                "code.txt",
+                "text/plain",
+                "let x = 5;".toByteArray(),
+            )
+        val config =
+            MockMultipartFile(
+                "config",
+                "config.txt",
+                "text/plain",
+                "not json".toByteArray(),
+            )
 
-        mockMvc.perform(
-            multipart("/api/printscript/verify")
-                .file(snippet)
-                .file(config)
-                .param("version", "1.0")
-        )
-            .andExpect(status().isBadRequest)
+        mockMvc
+            .perform(
+                multipart("/api/printscript/verify")
+                    .file(snippet)
+                    .file(config)
+                    .param("version", "1.0"),
+            ).andExpect(status().isBadRequest)
             .andExpect(content().string("no configuration file was found"))
     }
 }
