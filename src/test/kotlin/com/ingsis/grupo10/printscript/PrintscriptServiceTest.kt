@@ -1,8 +1,10 @@
-package com.ingsis.grupo10.printscript.printscript.service
+package com.ingsis.grupo10.printscript
 
+import com.ingsis.grupo10.printscript.printscript.service.PrintscriptService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.ArgumentMatchers
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpStatus
@@ -15,7 +17,7 @@ class PrintscriptServiceTest {
     private val printscriptService = PrintscriptService()
 
     // Helper function to avoid null issues with Mockito in Kotlin
-    private fun <T> any(): T = org.mockito.ArgumentMatchers.any()
+    private fun <T> any(): T = ArgumentMatchers.any()
 
     @Test
     fun execute_valid_code_returns_output() {
