@@ -89,7 +89,18 @@
 name: new-version-workflow
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      repository:
+        required: true
+        type: string
+      ref:
+        required: false
+        default: main
+        type: string
+    secrets:
+      REPO_PAT:    # nombre a elección
+        required: true
 
 permissions:
   contents: read
