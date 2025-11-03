@@ -1,91 +1,3 @@
-#name: new_version_workflow
-#
-#on:
-#  workflow_dispatch:
-#    inputs:
-#      tag:
-#        description: "Tag a usar (ej. v1.2.3). Si lo dejás vacío y no es manual, se toma el del push."
-#        required: false
-#
-#  push:
-#    tags:
-#      - "v*"
-#
-#permissions:
-#  contents: read
-#  packages: write
-#
-#jobs:
-#  detect-tag:
-#    runs-on: ubuntu-latest
-#    outputs:
-#      tag: ${{ steps.find.outputs.tag }}
-#    steps:
-#      - name: Checkout with history and tags
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#          fetch-tags: true
-#
-#      - name: Resolve tag
-#        id: find
-#        shell: bash
-#        run: |
-#          set -euo pipefail
-#          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF}" == refs/tags/* ]]; then
-#            TAG="${GITHUB_REF#refs/tags/}"
-#          else
-#            # workflow_dispatch (manual): permitir pasar el tag por input
-#            TAG="${{ inputs.tag || '' }}"
-#          fi
-#
-#          if [[ -z "${TAG}" ]]; then
-#            echo "No tag provided/detected. Exiting gracefully."
-#            echo "tag=" >> "$GITHUB_OUTPUT"
-#            exit 0
-#          fi
-#
-#          echo "Using tag: ${TAG}"
-#          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-#
-#  publish-package:
-#    needs: detect-tag
-#    if: ${{ needs.detect-tag.outputs.tag != '' }}
-#    uses: ./.github/workflows/publish.yml
-#    secrets: inherit
-#
-#  publish-image:
-#    needs: detect-tag
-#    if: ${{ needs.detect-tag.outputs.tag != '' }}
-#    uses: ./.github/workflows/ghcr_deploy_docker_image.yml
-#    with:
-#      tag: ${{ needs.detect-tag.outputs.tag }}
-#    secrets: inherit
-#
-#  start-vm:
-#    needs: detect-tag
-#    if: ${{ needs.detect-tag.outputs.tag != '' }}
-#    uses: ./.github/workflows/azure_start_vm.yml
-#    secrets: inherit
-#
-#  deploy-image-in-vm:
-#    needs:
-#      - publish-image
-#      - start-vm
-#      - detect-tag
-#    if: ${{ needs.detect-tag.outputs.tag != '' }}
-#    uses: ./.github/workflows/azure_deploy_image.yml
-#    with:
-#      tag: ${{ needs.detect-tag.outputs.tag }}
-#    secrets: inherit
-#
-#  shut-down-vm:
-#    needs:
-#      - start-vm
-#      - deploy-image-in-vm
-#    if: ${{ needs.start-vm.outputs.pre_status == 'VM deallocated' }}
-#    secrets: inherit
-
 name: new-version-workflow
 
 on:
@@ -114,6 +26,9 @@ jobs:
   publish-img:
     uses: IngSisG10/snippet-infrastructure/.github/workflows/publish_docker_img_to_ghcr.yml@main
     secrets: inherit
+    with:
+      repository: IngSisG10/printscript-service
+    
 
   deploy-azure:
     needs: publish-img
