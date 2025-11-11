@@ -11,5 +11,5 @@ permissions:
 jobs:
   coverage:
     name: coverage kover
-    uses: IngSisG10/snippet-infrastructure/.github/workflows/coverage.yml
+    uses: IngSisG10/snippet-infrastructure/.github/workflows/coverage.yml@main
     secrets: inherit
