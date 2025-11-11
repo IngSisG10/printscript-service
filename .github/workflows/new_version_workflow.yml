@@ -15,11 +15,18 @@ jobs:
   publish-img:
     uses: IngSisG10/snippet-infrastructure/.github/workflows/publish_docker_img_to_ghcr.yml@main
     secrets: inherit
-    with:
-      repository: IngSisG10/printscript-service
-    
+
+  start-vm:
+    needs: publish-img
+    uses: IngSisG10/printscript-service/.github/workflows/azure_start_vm.yml
+    secrets: inherit
 
   deploy-azure:
-    needs: publish-img
+    needs: start-vm
     uses: IngSisG10/snippet-infrastructure/.github/workflows/azure_deploy_img.yml@main
+    secrets: inherit
+
+  shut-down-vm:
+    needs: publish-package
+    uses: IngSisG10/printscript-service/.github/workflows/azure_sto_vm.yml
     secrets: inherit
