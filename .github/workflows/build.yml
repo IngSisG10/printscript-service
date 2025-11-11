@@ -11,4 +11,7 @@ jobs:
   build:
     name: build
     uses: IngSisG10/snippet-infrastructure/.github/workflows/new_version_workflow.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
     secrets: inherit
