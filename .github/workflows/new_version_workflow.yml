@@ -27,6 +27,9 @@ jobs:
     secrets: inherit
 
   shut-down-vm:
-    needs: publish-package
+    needs:
+      - start-vm
+      - deploy-azure
+    if: ${{ needs.start-vm.outputs.pre_status == 'VM deallocated' }}
     uses: IngSisG10/printscript-service/.github/workflows/azure_sto_vm.yml
     secrets: inherit
