@@ -31,5 +31,5 @@ jobs:
       - start-vm
       - deploy-azure
     if: ${{ needs.start-vm.outputs.pre_status == 'VM deallocated' }}
-    uses: IngSisG10/printscript-service/.github/workflows/azure_sto_vm.yml
+    uses: IngSisG10/printscript-service/.github/workflows/azure_stop_vm.yml
     secrets: inherit
