@@ -12,4 +12,7 @@ jobs:
   coverage:
     name: coverage kover
     uses: IngSisG10/snippet-infrastructure/.github/workflows/coverage.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
     secrets: inherit
