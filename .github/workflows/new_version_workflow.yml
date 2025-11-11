@@ -1,18 +1,7 @@
 name: new-version-workflow
 
 on:
-  workflow_call:
-    inputs:
-      repository:
-        required: true
-        type: string
-      ref:
-        required: false
-        default: main
-        type: string
-    secrets:
-      REPO_PAT:    # nombre a elección
-        required: true
+  workflow_dispatch: {}
 
 permissions:
   contents: read
