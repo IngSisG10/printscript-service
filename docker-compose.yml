@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   app:
     build:
@@ -5,4 +7,10 @@ services:
       dockerfile: Dockerfile.local
     container_name: printscript-service
     ports:
-      - "8080:8080"
+      - "8084:8080"  # Changed to avoid port conflict with snippet-service
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true
