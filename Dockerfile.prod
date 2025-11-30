@@ -12,5 +12,7 @@ RUN --mount=type=secret,id=gpr_user \
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+COPY --from=builder /home/gradle/src/newrelic/newrelic-agent.jar /app/newrelic-agent.jar
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/app.jar
+ENV JAVA_TOOL_OPTIONS="-javaagent:/app/newrelic-agent.jar"
 ENTRYPOINT ["java","-jar","/app/app.jar"]
