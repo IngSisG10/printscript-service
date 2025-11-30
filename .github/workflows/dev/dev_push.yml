@@ -1,0 +1,28 @@
+name: dev_push.yml
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  publish_image:
+    uses: IngSisG10/snippet-infrastructure/.github/workflows/dev/image/publish_to_ghcr.yml@main
+    secrets: inherit
+
+  start_vm:
+    needs: publish_image
+    uses: IngSisG10/snippet-infrastructure/.github/workflows/dev/azure/start_vm.yml@main
+    secrets: inherit
+
+  deploy_image:
+    needs: start_vm
+    uses: IngSisG10/snippet-infrastructure/.github/workflows/dev/azure/deploy/deploy-single-service-dev.yml@main
+    secrets: inherit
+
+  stop_vm:
+    needs:
+      - start_vm
+      - deploy_image
+    if: ${{ needs.start-vm.outputs.pre_status == 'VM deallocated' }}
+    uses: IngSisG10/snippet-infrastructure/.github/workflows/dev/azure/stop_vm.yml@main
+    secrets: inherit
