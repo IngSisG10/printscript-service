@@ -4,5 +4,5 @@ on:
 
 jobs:
   publish_image:
-    uses: IngSisG10/snippet-infrastructure/.github/workflows/dev/image/publish_to_ghcr.yml@main
+    uses: IngSisG10/snippet-infrastructure/.github/workflows/dev-image-publish.yml@main
     secrets: inherit
