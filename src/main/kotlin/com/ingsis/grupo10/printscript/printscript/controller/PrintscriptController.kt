@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -57,4 +59,9 @@ class PrintscriptController(
             configContent(config) ?: return ResponseEntity.badRequest().body("no configuration file was found")
         return printscriptService.format(snippet.inputStream, configContent, version ?: "1.0")
     }
+
+    @GetMapping("/format/{version}")
+    fun getFormatData(
+        @PathVariable version: String,
+    ): ResponseEntity<out Any?> = printscriptService.getFormatData(version)
 }
