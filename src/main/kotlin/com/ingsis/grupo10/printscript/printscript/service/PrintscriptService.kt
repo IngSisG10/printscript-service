@@ -126,4 +126,6 @@ class PrintscriptService {
         }
         return ResponseEntity.ok().body(outputBuilder.toString())
     }
+
+    fun getFormatData(version: String): ResponseEntity<out Any?> = ResponseEntity.ok().body(FormatterUtil.getFormatterFixesData(version))
 }
