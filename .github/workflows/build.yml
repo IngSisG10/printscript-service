@@ -2,7 +2,9 @@ name: Build & Test
 
 on:
   pull_request:
-    branches: [ "main" ]   # se ejecuta en PRs hacia master
+    branches:
+      - main
+      - dev
 
 permissions:
   contents: read
