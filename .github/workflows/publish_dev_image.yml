@@ -4,6 +4,7 @@ on:
 
 permissions:
   packages: write
+  contents: read
 
 jobs:
   publish_image:
