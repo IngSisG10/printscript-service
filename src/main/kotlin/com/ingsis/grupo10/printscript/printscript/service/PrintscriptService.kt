@@ -8,6 +8,7 @@ import common.util.segmentsBySemicolonPreserveWhitespace
 import formatter.util.FormatterUtil
 import interpreter.Interpreter
 import lexer.util.LexerUtil.Companion.createLexer
+import linter.util.LinterUtil
 import linter.util.LinterUtil.Companion.createLinter
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpHeaders
@@ -128,4 +129,6 @@ class PrintscriptService {
     }
 
     fun getFormatData(version: String): ResponseEntity<out Any?> = ResponseEntity.ok().body(FormatterUtil.getFormatterFixesData(version))
+
+    fun getLintData(version: String): ResponseEntity<out Any?> = ResponseEntity.ok().body(LinterUtil.getLinterRulesData(version))
 }
