@@ -68,5 +68,5 @@ class PrintscriptController(
     @GetMapping("/lint/{version}")
     fun getLintData(
         @PathVariable version: String,
-    ) : ResponseEntity<out Any?> = printscriptService.getLintData(version)
+    ): ResponseEntity<out Any?> = printscriptService.getLintData(version)
 }
